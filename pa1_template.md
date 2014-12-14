@@ -56,12 +56,14 @@ Outside of this code, I downloaded and uncompressed the file from https://d396qu
 
 read in activity.csv and converted date column to date format
 
-```{r, echo = TRUE}
+
+```r
 
 setwd("c:/_coursera")
-actdata<-read.csv("activity.csv")
-actdata$date<-as.Date(actdata$date, format = '%Y-%m-%d')
+actdata <- read.csv("activity.csv")
+actdata$date <- as.Date(actdata$date, format = "%Y-%m-%d")
 ```
+
 
 <H2>What is mean total number of steps taken per day?</H2>
 
@@ -74,23 +76,32 @@ actdata$date<-as.Date(actdata$date, format = '%Y-%m-%d')
 <H3>What is mean total number of steps taken per day?</h3>
 
 I rolled up the step counts by date
-```{r, echo=TRUE}
-actdaysteps<-aggregate(steps~date, actdata, sum, na.rm=TRUE)
+
+```r
+actdaysteps <- aggregate(steps ~ date, actdata, sum, na.rm = TRUE)
 ```
+
 
 Create histogram of steps for each date
-```{r,echo=TRUE}
-histogram<-barplot(actdaysteps$steps, names.arg =actdaysteps$date, xlab="total steps per day", main="Hisogram of Steps Per Day")
+
+```r
+histogram <- barplot(actdaysteps$steps, names.arg = actdaysteps$date, xlab = "total steps per day", 
+    main = "Hisogram of Steps Per Day")
 ```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+
 
 Calculate the mean first and then the median of steps per date
-```{r, echo=TRUE}
 
-actdaystepsmean<-mean(actdaysteps$steps, na.rm=T)
-actdaystepsmedian<-median(actdaysteps$steps, na.rm=T)
+```r
+
+actdaystepsmean <- mean(actdaysteps$steps, na.rm = T)
+actdaystepsmedian <- median(actdaysteps$steps, na.rm = T)
 ```
 
-The mean is `r actdaystepsmean` and the median is `r actdaystepsmedian`.
+
+The mean is 1.0766 &times; 10<sup>4</sup> and the median is 10765.
 
   
 <H3>What is the average daily activity pattern?</h3>
@@ -100,22 +111,31 @@ The mean is `r actdaystepsmean` and the median is `r actdaystepsmedian`.
 * Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 calc the average number of steps
-```{r, echo=TRUE}
-        avginterval<-aggregate(steps~interval,actdata,mean)
+
+```r
+avginterval <- aggregate(steps ~ interval, actdata, mean)
 ```
 
+
 plot the interval (5 minute) across the x axis and the average number of steps across all dates
-```{r,echo=TRUE}
-        plot(avginterval,type="l",main="Avg Step by Interval across Dates", xlab="Interval",ylab="Avg Steps")
+
+```r
+plot(avginterval, type = "l", main = "Avg Step by Interval across Dates", xlab = "Interval", 
+    ylab = "Avg Steps")
 ```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
+
 
 Identify the interval with the most steps.
 
-```{r, echo=TRUE}
-maxintervalsteps<-avginterval$interval[which.max(avginterval$steps)]
+
+```r
+maxintervalsteps <- avginterval$interval[which.max(avginterval$steps)]
 ```
 
-The interval with the most steps is `r maxintervalsteps`
+
+The interval with the most steps is 835
 
 
 
@@ -132,41 +152,76 @@ Note that there are a number of days/intervals where there are missing values (c
 * Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 Calculating the total number of rows with missing values in the dataset.
-```{r, echo=TRUE}
-navalues<-sum(is.na(actdata))
+
+```r
+navalues <- sum(is.na(actdata))
 ```
 
-count of NA values is `r navalues`.
+
+count of NA values is 2304.
  
 * Using the mean to fill the missing value
 
 Use the average number of steps per interval (avginterval$steps) to replace missing values.
-```{r, echo=TRUE}
-actdatanona <- actdata 
+
+```r
+actdatanona <- actdata
 head(actdatanona)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
+
+```r
 for (i in 1:nrow(actdatanona)) {
-        if (is.na(actdatanona$steps[i])) {
-                actdatanona$steps[i] <- avginterval[which(actdatanona$interval[i] == avginterval$interval), ]$steps
-        }
+    if (is.na(actdatanona$steps[i])) {
+        actdatanona$steps[i] <- avginterval[which(actdatanona$interval[i] == 
+            avginterval$interval), ]$steps
+    }
 }
 head(actdatanona)
 ```
 
+```
+##     steps       date interval
+## 1 1.71698 2012-10-01        0
+## 2 0.33962 2012-10-01        5
+## 3 0.13208 2012-10-01       10
+## 4 0.15094 2012-10-01       15
+## 5 0.07547 2012-10-01       20
+## 6 2.09434 2012-10-01       25
+```
+
+
 
 Create histogram for steps by date with imputed data.
-```{r,echo=TRUE}
-actdaystepsnona<-aggregate(steps~date, actdatanona, sum, na.rm=TRUE)
-histogram<-barplot(actdaystepsnona$steps, names.arg =actdaystepsnona$date, xlab="total steps per day", main="Hisogram of Steps Per Day")
+
+```r
+actdaystepsnona <- aggregate(steps ~ date, actdatanona, sum, na.rm = TRUE)
+histogram <- barplot(actdaystepsnona$steps, names.arg = actdaystepsnona$date, 
+    xlab = "total steps per day", main = "Hisogram of Steps Per Day")
 ```
+
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10.png) 
+
 
 Calculate the mean first and then the median of steps per date of the imputed data then see how it compares to the original data with the missing values
-```{r, echo=TRUE}
-actdaystepsnonamean<-mean(actdaystepsnona$steps, na.rm=T)
-actdaystepsnonamedian<-median(actdaystepsnona$steps, na.rm=T)
+
+```r
+actdaystepsnonamean <- mean(actdaystepsnona$steps, na.rm = T)
+actdaystepsnonamedian <- median(actdaystepsnona$steps, na.rm = T)
 ```
 
-For the original data: the mean is `r actdaystepsmean` and the median is `r actdaystepsmedian`.
-For the imputed data: the mean is `r actdaystepsnonamean` and the median is `r actdaystepsnonamedian`.
+
+For the original data: the mean is 1.0766 &times; 10<sup>4</sup> and the median is 10765.
+For the imputed data: the mean is 1.0766 &times; 10<sup>4</sup> and the median is 1.0766 &times; 10<sup>4</sup>.
 It makes sense that the means are so close while the medians are off a bit as we used the mean to replace the missing values.
 
 <H3>Are there differences in activity patterns between weekdays and weekends?</H3>
@@ -178,17 +233,42 @@ For this part the weekdays() function may be of some help here. Use the dataset 
 * Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
 Create a new factor variable called daytype.  Values will be weekday or weekend
-```{r, echo=TRUE}
+
+```r
 actdatanona$daytype <- factor(format(actdatanona$date, "%A"))
-table(actdatanona$daytype)
-levels(actdatanona$daytype)<-list(weekend = c("Saturday", "Sunday"), 
-                                  weekday = c("Monday", "Tuesday","Wednesday","Thursday", "Friday")
-                                  )
 table(actdatanona$daytype)
 ```
 
-weekday and weekend plot grids below for comparison.
-```{r, echo=TRUE}
-library(ggplot2)
-qplot(interval, steps, data = actdatanona, facets = . ~ daytype, geom='smooth')
 ```
+## 
+##    Friday    Monday  Saturday    Sunday  Thursday   Tuesday Wednesday 
+##      2592      2592      2304      2304      2592      2592      2592
+```
+
+```r
+levels(actdatanona$daytype) <- list(weekend = c("Saturday", "Sunday"), weekday = c("Monday", 
+    "Tuesday", "Wednesday", "Thursday", "Friday"))
+table(actdatanona$daytype)
+```
+
+```
+## 
+## weekend weekday 
+##    4608   12960
+```
+
+
+weekday and weekend plot grids below for comparison.
+
+```r
+library(ggplot2)
+qplot(interval, steps, data = actdatanona, facets = . ~ daytype, geom = "smooth")
+```
+
+```
+## geom_smooth: method="auto" and size of largest group is >=1000, so using gam with formula: y ~ s(x, bs = "cs"). Use 'method = x' to change the smoothing method.
+## geom_smooth: method="auto" and size of largest group is >=1000, so using gam with formula: y ~ s(x, bs = "cs"). Use 'method = x' to change the smoothing method.
+```
+
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13.png) 
+
